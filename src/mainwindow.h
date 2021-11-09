@@ -15,7 +15,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void setStringID(QString id);
+    int getIntID();
+
 private:
     Ui::MainWindow *ui;
+        QString _test_id;
 };
 #endif // MAINWINDOW_H
