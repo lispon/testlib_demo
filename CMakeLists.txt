@@ -14,18 +14,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 
-set(TS_FILES testlib_demo_zh_CN.ts)
+set(TS_FILES ${CMAKE_PROJECT_NAME}_zh_CN.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        ${TS_FILES}
+        src/main.cpp
+        src/${TS_FILES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(testlib_demo
+    qt_add_executable(${CMAKE_PROJECT_NAME}
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
@@ -37,13 +34,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
     if(ANDROID)
-        add_library(testlib_demo SHARED
+        add_library(${CMAKE_PROJECT_NAME} SHARED
             ${PROJECT_SOURCES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(testlib_demo
+        add_executable(${CMAKE_PROJECT_NAME}
             ${PROJECT_SOURCES}
         )
     endif()
@@ -51,14 +48,27 @@ else()
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
-target_link_libraries(testlib_demo PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+## library.
+set(SRC_PROJECT main_form)
 
-set_target_properties(testlib_demo PROPERTIES
+add_subdirectory(src)
+
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    PRIVATE
+        ${SRC_PROJECT}
+)
+
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(testlib_demo)
+    qt_finalize_executable(${CMAKE_PROJECT_NAME})
 endif()
+
+
+add_subdirectory(qtest)
+
+add_subdirectory(gtest)
